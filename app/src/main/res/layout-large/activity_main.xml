@@ -11,11 +11,11 @@
         android:layout_height="match_parent"
         android:layout_weight="2" />
 
-    <fragment
+    <FrameLayout
         android:name="com.linuxkyrios.trainingapp.WorkoutDetailFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="3"
-        android:id="@+id/detail_frag" />
+        android:id="@+id/fragment_container" />
 
 </LinearLayout>
