@@ -2,7 +2,6 @@ package com.linuxkyrios.trainingapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
-
 import android.os.Bundle;
 import android.view.View;
 import android.content.Intent;
@@ -31,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements WorkoutListFragme
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             // Adding transaction to back stack
             ft.addToBackStack(null);
+            ft.commit();
         } else {
             Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra(DetailActivity.EXTRA_WORKOUT_ID, (int)id);
