@@ -2,6 +2,7 @@ package com.linuxkyrios.trainingapp;
 
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,17 @@ public class WorkoutDetailFragment extends Fragment {
     // Overriding onCreate method to save data if device is rotated
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
+        //Fragment should not be added if activity was restored
+        if (savedInstanceState == null) {
+            StopwatchFragment stopwatch = new StopwatchFragment();
+            //Beginning transaction using getChildFragmentManager
+            FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+            ft.add(R.id.stopwatch_container, stopwatch);//Adding stopwatch to layout, and all transaction to back stack
+            ft.addToBackStack(null);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            //Approve the transaction
+            ft.commit();
+        } else {
             workoutId = savedInstanceState.getLong("workoutId");
         }
     }
