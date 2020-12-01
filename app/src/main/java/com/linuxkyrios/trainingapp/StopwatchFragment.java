@@ -1,64 +1,100 @@
 package com.linuxkyrios.trainingapp;
 
 import android.os.Bundle;
+import android.os.Handler;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import java.util.Locale;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link StopwatchFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class StopwatchFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public StopwatchFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment StopwatchFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static StopwatchFragment newInstance(String param1, String param2) {
-        StopwatchFragment fragment = new StopwatchFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    // seconds displayed by stopwatch
+    private int seconds = 0;
+    // is stopwatch running?
+    private boolean running;
+    private boolean wasRunning;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        if (savedInstanceState != null) {
+            seconds = savedInstanceState.getInt("seconds");
+            running = savedInstanceState.getBoolean("running");
+            wasRunning = savedInstanceState.getBoolean("wasRunning");
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_stopwatch, container, false);
+    public View onCreateView(LayoutInflater inflater,
+                         ViewGroup container,
+                         Bundle savedInstanceState) {
+        //This method determines fragment layout and calling method runTimer transmits layout object to method
+        View layout = inflater.inflate(R.layout.fragment_stopwatch, container, false);
+        runTimer(layout);
+        return layout;
+    }
+
+    @Override
+    // If stopwatch activity was paused, saving its status  before pausing
+    public void onPause() {
+        super.onPause();
+        wasRunning = running;
+        running = false;
+    }
+
+    @Override
+    // If stopwatch was running before
+    public void onResume() {
+        super.onResume();
+        if (wasRunning) {
+            running = true;
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putInt("seconds", seconds);
+        savedInstanceState.putBoolean("running", running);
+        savedInstanceState.putBoolean("wasRunning", wasRunning);
+    }
+
+    // Activate when button start is clicked
+    public void onClickStart(View view) {
+        running = true;
+    }
+
+    //Activate when stop button is pressed
+    public void onClickStop(View view) {
+        running = false;
+    }
+
+    //Activate when button reset is pressed
+    public void onClickReset(View view) {
+        running = false;
+        seconds = 0;
+    }
+
+    private void runTimer(View view) {
+        final TextView timeView = (TextView) view.findViewById(R.id.time_view);
+        //Putting code in handler object allows to run it in background
+        final Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                int hours = seconds / 3600;
+                int minutes = (seconds % 3600) / 60;
+                int secs = seconds % 60;
+                String time = String.format("%d:%02d:%02d", hours, minutes, secs);
+                timeView.setText(time);
+                if(running) {
+                    seconds++;
+                }
+                handler.postDelayed(this, 1000);
+            }
+        });
     }
 }
